@@ -1,0 +1,77 @@
+class LFUCache {
+private:
+    struct Node {
+        int key;
+        int val;
+        int freq;
+    };
+
+    int capacity;
+    int minFreq;
+
+    // key 對應到節點資訊
+    unordered_map<int, list<Node>::iterator> keyNodeMap;
+    // freq 對應到該頻率的節點列表
+    unordered_map<int, list<Node>> freqListMap;
+
+    void updateFreq(int key) {
+        auto nodeIt = keyNodeMap[key];
+        int freq = nodeIt->freq;
+        int val = nodeIt->val;
+
+        // 移除舊頻率
+        freqListMap[freq].erase(nodeIt);
+        if (freqListMap[freq].empty()) {
+            freqListMap.erase(freq);
+            if (minFreq == freq)
+                minFreq++;
+        }
+
+        // 增加新頻率
+        freqListMap[freq + 1].push_front({key, val, freq + 1});
+        keyNodeMap[key] = freqListMap[freq + 1].begin();
+    }
+
+public:
+    LFUCache(int capacity) {
+        this->capacity = capacity;
+        minFreq = 0;
+        keyNodeMap.clear();
+        freqListMap.clear();
+    }
+    
+    int get(int key) {
+        if (keyNodeMap.find(key) == keyNodeMap.end())
+            return -1;
+
+        int val = keyNodeMap[key]->val;
+        updateFreq(key);
+        return val;
+    }
+    
+    void put(int key, int value) {
+        if (capacity == 0)
+            return;
+
+        if (keyNodeMap.find(key) != keyNodeMap.end()) {
+            // 更新現有的 key
+            keyNodeMap[key]->val = value;
+            updateFreq(key);
+        } else {
+            // 若容量滿，移除最少使用的節點
+            if (keyNodeMap.size() == capacity) {
+                auto& list = freqListMap[minFreq];
+                int oldKey = list.back().key;
+                list.pop_back();
+                keyNodeMap.erase(oldKey);
+                if (list.empty()) {
+                    freqListMap.erase(minFreq);
+                }
+            }
+            // 加入新節點
+            freqListMap[1].push_front({key, value, 1});
+            keyNodeMap[key] = freqListMap[1].begin();
+            minFreq = 1;
+        }
+    }
+};

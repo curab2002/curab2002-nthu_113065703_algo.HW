@@ -1,0 +1,24 @@
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        deque<int> dq;          // 存放元素索引的雙端隊列
+        vector<int> result;
+
+        for (int i = 0; i < nums.size(); ++i) {
+            // 隊列尾端元素若較小，則移除
+            while (!dq.empty() && nums[dq.back()] <= nums[i])
+                dq.pop_back();
+
+            dq.push_back(i);  // 新元素加入隊尾
+
+            // 隊列前端元素超過窗口範圍，移除
+            if (dq.front() <= i - k)
+                dq.pop_front();
+
+            // 窗口已滿，紀錄當前最大值
+            if (i >= k - 1)
+                result.push_back(nums[dq.front()]);
+        }
+        return result;
+    }
+};

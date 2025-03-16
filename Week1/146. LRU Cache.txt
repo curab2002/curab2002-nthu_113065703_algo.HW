@@ -1,0 +1,51 @@
+class LRUCache {
+private:
+    int capacity;
+    // 雙向鏈結串列: 儲存 {key, value}
+    list<pair<int, int>> cache; 
+
+    // Hash table: store key to list 的 iterator 映射
+    unordered_map<int, list<pair<int, int>>::iterator> map;
+
+
+public:
+    LRUCache(int capacity) {
+        this->capacity = capacity; // 設定快取容量
+        cache.clear();             // 初始化鏈結串列
+        map.clear();
+    }
+    
+    int get(int key) {
+        if (map.find(key) == map.end())
+            return -1;
+
+        // 將找到的元素移到 list 的最前面 (最近使用)
+        cache.splice(cache.begin(), cache, map[key]);
+        return map[key]->second;
+    }
+    
+    void put(int key, int value) {
+        if (map.find(key) != map.end()) {
+            // 更新值並移到最前面
+            map[key]->second = value;
+            cache.splice(cache.begin(), cache, map[key]);
+        } else {
+            // 如果滿了，先移除最後一個節點
+            if (cache.size() == capacity) {
+                auto last = cache.back();
+                map.erase(last.first);   // 刪除最久未使用元素
+                cache.pop_back();
+            }
+            // 新元素插到最前面
+            cache.emplace_front(key, value);
+            map[key] = cache.begin();
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
