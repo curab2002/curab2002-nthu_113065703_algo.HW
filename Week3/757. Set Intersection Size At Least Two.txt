@@ -1,0 +1,33 @@
+class Solution {
+public:
+    int intersectionSizeTwo(vector<vector<int>>& intervals) {
+        // Step 1: Sort intervals by end in ascending order
+        // If two intervals have the same end, sort by start in descending order
+        sort(intervals.begin(), intervals.end(), [](const vector<int>& a, const vector<int>& b) {
+            return a[1] == b[1] ? a[0] > b[0] : a[1] < b[1];
+        });
+
+        vector<int> nums;
+        int count = 0;
+
+        for (const auto& interval : intervals) {
+            int start = interval[0], end = interval[1];
+            
+            // Count how many numbers from 'nums' are within the current interval
+            int inSet = count >= 2 && nums[count - 2] >= start ? 2 :
+                        count >= 1 && nums[count - 1] >= start ? 1 : 0;
+
+            // If we need more numbers, add them
+            if (inSet == 0) {
+                nums.push_back(end - 1);
+                nums.push_back(end);
+                count += 2;
+            } else if (inSet == 1) {
+                nums.push_back(end);
+                count += 1;
+            }
+        }
+
+        return count;
+    }
+};

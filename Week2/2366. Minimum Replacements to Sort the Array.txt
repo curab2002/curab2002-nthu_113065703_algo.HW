@@ -1,0 +1,24 @@
+class Solution {
+public:
+    long long minimumReplacement(vector<int>& nums) {
+        int n = nums.size();
+        long long operations = 0; // to record total number of operations
+        
+        // Traverse from right to left
+        for(int i = n - 2; i >= 0; --i) {
+            // If current number is greater than next number, split is needed
+            if(nums[i] > nums[i + 1]) {
+                // Calculate how many parts we need to split nums[i] into
+                long long parts = (nums[i] + nums[i + 1] - 1) / nums[i + 1];
+                
+                // Add (parts - 1) to total operations (splitting into parts requires parts-1 operations)
+                operations += parts - 1;
+                
+                // Update nums[i] to the largest possible value after splitting
+                nums[i] = nums[i] / parts;
+            }
+        }
+        return operations;
+        
+    }
+};

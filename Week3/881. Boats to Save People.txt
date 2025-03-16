@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int numRescueBoats(vector<int>& people, int limit) {
+        // Sort people in ascending order
+        sort(people.begin(), people.end());
+        
+        int left = 0, right = people.size() - 1;
+        int boats = 0;
+
+        while (left <= right) {
+            // If the lightest + heaviest person can fit in one boat
+            if (people[left] + people[right] <= limit) {
+                left++; // Move to next lightest person
+            }
+            // The heaviest person always takes a boat (either alone or with someone)
+            right--;
+            boats++; // Every loop means we used a boat
+        }
+        return boats;
+    }
+};

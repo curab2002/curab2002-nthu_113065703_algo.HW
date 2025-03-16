@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int minSwapsCouples(vector<int>& row) {
+        int n = row.size() / 2; // Number of couples
+        vector<int> pos(row.size()); // Store each person's index in the row
+
+        // Build position mapping: person -> seat index
+        for (int i = 0; i < row.size(); ++i) {
+            pos[row[i]] = i;
+        }
+
+        int swaps = 0;
+
+        // Iterate over every couple's first position
+        for (int i = 0; i < row.size(); i += 2) {
+            int firstPerson = row[i];
+            int secondPerson = firstPerson ^ 1; // The couple pair (0^1=1, 2^1=3, etc.)
+
+            // If they are already seated together, continue
+            if (row[i + 1] == secondPerson) continue;
+
+            // Otherwise, swap the person at i+1 with the correct partner
+            swaps++;
+
+            int incorrectPerson = row[i + 1];
+            int correctIndex = pos[secondPerson];
+
+            // Swap in row
+            swap(row[i + 1], row[correctIndex]);
+
+            // Update position mapping
+            pos[incorrectPerson] = correctIndex;
+            pos[secondPerson] = i + 1;
+        }
+
+        return swaps;
+    }
+};
