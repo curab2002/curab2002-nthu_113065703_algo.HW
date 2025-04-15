@@ -1,0 +1,21 @@
+class Solution {
+public:
+    double myPow(double x, int n) {
+        long long N = n;  // 用 long long 處理 n = INT_MIN 的情況
+        if (N < 0) {
+            x = 1 / x;
+            N = -N;
+        }
+
+        double result = 1.0;
+        while (N > 0) {
+            if (N % 2 == 1) {      // if odd，乘上 x
+                result *= x;
+            }
+            x *= x;                // 底數平方
+            N /= 2;                // 指數/2
+        }
+        return result;
+        
+    }
+};

@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int maxSum = INT_MIN; // 紀錄整體最大路徑和
+
+    int maxPathDown(TreeNode* root) {
+        if (!root) return 0;
+
+        // 左右子樹最大貢獻值，若小於 0 則視為 0（不要那條路）
+        int left = max(0, maxPathDown(root->left));
+        int right = max(0, maxPathDown(root->right));
+
+        // 以當前節點為「彙總節點」的最大路徑總和
+        int currPathSum = root->val + left + right;
+
+        // 更新全域最大路徑
+        maxSum = max(maxSum, currPathSum);
+
+        // 回傳給父節點的最大貢獻值（只能選一邊）
+        return root->val + max(left, right);
+    }
+    int maxPathSum(TreeNode* root) {
+        maxPathDown(root);
+        return maxSum;
+    }
+};

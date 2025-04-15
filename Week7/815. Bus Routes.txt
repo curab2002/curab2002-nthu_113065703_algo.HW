@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
+        if (source == target) return 0;
+
+        // 建立: bus stop -> 可搭的 bus 編號列表
+        unordered_map<int, vector<int>> stopToBuses;
+        for (int i = 0; i < routes.size(); ++i) {
+            for (int stop : routes[i]) {
+                stopToBuses[stop].push_back(i);
+            }
+        }
+
+        // BFS 初始化
+        queue<int> q;                 // 放當前可到達的 bus stop
+        unordered_set<int> visitedBus; // 防止重複搭同台 bus
+        unordered_set<int> visitedStop; // 防止重複走相同 stop
+
+        q.push(source);
+        visitedStop.insert(source);
+
+        int busesTaken = 0;
+
+        while (!q.empty()) {
+            int size = q.size();
+            busesTaken++;
+
+            for (int i = 0; i < size; ++i) {
+                int currStop = q.front();
+                q.pop();
+
+                // scan所有可在 currStop 搭乘的 bus
+                for (int bus : stopToBuses[currStop]) {
+                    if (visitedBus.count(bus)) continue; // 已搭過此 bus
+                    visitedBus.insert(bus);
+
+                    // 搭乘該 bus，拜訪它能到達的所有站點
+                    for (int nextStop : routes[bus]) {
+                        if (nextStop == target) return busesTaken;
+                        if (!visitedStop.count(nextStop)) {
+                            visitedStop.insert(nextStop);
+                            q.push(nextStop);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 無法到達目標
+        return -1; 
+    }
+};

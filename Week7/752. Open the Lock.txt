@@ -1,0 +1,47 @@
+class Solution {
+public:
+    int openLock(vector<string>& deadends, string target) {
+        unordered_set<string> dead(deadends.begin(), deadends.end());
+        unordered_set<string> visited;
+        queue<string> q;
+
+        // edge case: 起點就是死鎖
+        if (dead.count("0000")) return -1;
+
+        // 初始設定
+        q.push("0000");
+        visited.insert("0000");
+        int steps = 0;
+
+        while (!q.empty()) {
+            int size = q.size();
+
+            // 每一層代表一步操作
+            for (int i = 0; i < size; ++i) {
+                string curr = q.front();
+                q.pop();
+
+                // 找到目標
+                if (curr == target) return steps;
+
+                // 對四位數的每一位嘗試 +1/-1
+                for (int j = 0; j < 4; ++j) {
+                    for (int move : {-1, 1}) {
+                        string next = curr;
+                        next[j] = (curr[j] - '0' + move + 10) % 10 + '0';
+
+                        // 若新狀態不是死鎖且未拜訪過，加入 queue
+                        if (!dead.count(next) && !visited.count(next)) {
+                            visited.insert(next);
+                            q.push(next);
+                        }
+                    }
+                }
+            }
+            steps++;
+        }
+
+        // 無法到達目標
+        return -1;   
+    }
+};

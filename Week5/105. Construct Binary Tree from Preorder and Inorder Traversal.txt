@@ -1,0 +1,50 @@
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+         // 建hash table來快速查表 inorder 裏的 root index
+        unordered_map<int, int> inMap;
+        for (int i = 0; i < inorder.size(); ++i) {
+            inMap[inorder[i]] = i;
+        }
+        
+        return build(preorder, 0, preorder.size() - 1,
+                     inorder, 0, inorder.size() - 1,
+                     inMap); 
+    }
+
+private:
+    // Recursion Fuction ： 根據 preorder[l1..r1], inorder[l2..r2] 建tree
+    TreeNode* build(const vector<int>& preorder, int l1, int r1,
+                    const vector<int>& inorder,  int l2, int r2,
+                    unordered_map<int,int>& inMap) {
+        // 若區間無效，返回空指標
+        if (l1 > r1 || l2 > r2) {
+            return nullptr;
+        }
+        
+        // 前序第一個元素就是 root
+        int rootVal = preorder[l1];
+        TreeNode* root = new TreeNode(rootVal);
+        
+        // 找到 root 在中序遍歷中的index
+        int idx = inMap[rootVal];
+        // 左子樹大小
+        int leftSize = idx - l2;
+        
+        // 建立左子樹
+        // preorder: [l1+1 .. l1+leftSize]  (在preorder裏，跳過root)
+        // inorder:  [l2 .. idx-1]
+        root->left = build(preorder, l1 + 1, l1 + leftSize,
+                           inorder, l2, idx - 1,
+                           inMap);
+        
+        // 建立右子樹
+        // preorder: [l1+leftSize+1 .. r1]
+        // inorder:  [idx+1 .. r2]
+        root->right = build(preorder, l1 + leftSize + 1, r1,
+                            inorder, idx + 1, r2,
+                            inMap);
+        
+        return root;
+    }
+};

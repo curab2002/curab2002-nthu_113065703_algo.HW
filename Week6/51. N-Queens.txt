@@ -1,0 +1,58 @@
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+         // 紀錄列、左右對角線上是否已有皇后
+        vector<bool> cols(n, false);
+        vector<bool> diag1(2*n - 1, false);
+        vector<bool> diag2(2*n - 1, false);
+
+        vector<int> placement(n, -1); // placement[r] = c 表示 row=r,col=c
+        vector<vector<string>> results;
+
+        backtrack(0, n, cols, diag1, diag2, placement, results);
+        return results;
+    }
+private:
+    void backtrack(int row, int n,
+                   vector<bool>& cols,
+                   vector<bool>& diag1,
+                   vector<bool>& diag2,
+                   vector<int>& placement,
+                   vector<vector<string>>& results) {
+
+        // 若 row == n，代表已放完 n 個皇后則產生一個解
+        if (row == n) {
+            results.push_back(constructBoard(placement, n));
+            return;
+        }
+
+        // 嘗試在 row 這一行的每一列 col 放皇后
+        for (int col = 0; col < n; ++col) {
+            // 斜線編號計算
+            int d1 = row - col + (n - 1);
+            int d2 = row + col;
+            // 檢查是否可放
+            if (!cols[col] && !diag1[d1] && !diag2[d2]) {
+                // 放下皇后
+                placement[row] = col;
+                cols[col] = diag1[d1] = diag2[d2] = true;
+
+                // 進入下一行
+                backtrack(row + 1, n, cols, diag1, diag2, placement, results);
+
+                // 回溯，恢復狀態
+                cols[col] = diag1[d1] = diag2[d2] = false;
+                placement[row] = -1;
+            }
+        }
+    }
+
+    // 將 placement[] 轉成題目要求的輸出格式
+    vector<string> constructBoard(const vector<int>& placement, int n) {
+        vector<string> board(n, string(n, '.'));
+        for (int r = 0; r < n; ++r) {
+            board[r][placement[r]] = 'Q';
+        }
+        return board;
+    }
+};

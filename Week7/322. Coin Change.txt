@@ -1,0 +1,20 @@
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+         // dp[i]：湊出金額 i 所需最少硬幣數
+        vector<int> dp(amount + 1, amount + 1); // 初始值（無限大）
+        dp[0] = 0; // base case：0元需要0個硬幣
+
+        // 對於每一個金額 i，嘗試所有的硬幣
+        for (int i = 1; i <= amount; ++i) {
+            for (int coin : coins) {
+                if (i - coin >= 0) {
+                    dp[i] = min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+
+        // 若 dp[amount] 仍為初始值，表示無法湊出
+        return (dp[amount] == amount + 1) ? -1 : dp[amount];
+    }
+};

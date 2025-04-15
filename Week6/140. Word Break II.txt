@@ -1,0 +1,52 @@
+class Solution {
+public:
+    // 字典使用 unordered_set，加速查找效率為 O(1)
+    unordered_set<string> dict;
+    // 記錄從某個 index 開始的所有可能組合（避免重複計算）
+    unordered_map<int, vector<string>> memo;
+
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        dict = unordered_set<string>(wordDict.begin(), wordDict.end());
+        return dfs(s, 0);
+    }
+    // dfs(start): 回傳從 s[start:] 開始的所有合法句子
+    vector<string> dfs(const string& s, int start) {
+        // 如果已經計算過 start 位置的結果，就直接回傳memo中的結果
+        if (memo.count(start)) return memo[start];
+
+        vector<string> result;
+
+        // base case: 如果已經到達字串尾端，代表成功切完一組，回傳空字串作為結尾
+        if (start == s.size()) {
+            result.push_back("");
+            return result;
+        }
+
+        // 從 start 開始，嘗試切出所有 s[start:end] 子字串
+        for (int end = start + 1; end <= s.size(); ++end) {
+            string word = s.substr(start, end - start); // 從 start 切到 end
+
+            // 如果 word 在字典中是合法單字
+            if (dict.count(word)) {
+                // 遞迴找出從 end 開始的所有句子
+                vector<string> subsentences = dfs(s, end);
+
+                // 把當前 word 接到子句前面
+                for (const string& sub : subsentences) {
+                    // 如果 sub 是空的（代表是最後一段），就直接放 word
+                    if (sub.empty()) {
+                        result.push_back(word);
+                    } else {
+                        // 否則把 word + " " + sub 組成一句話
+                        result.push_back(word + " " + sub);
+                    }
+                }
+            }
+        }
+
+        // 記錄當前結果到memo中
+        memo[start] = result;
+        return result;
+    }
+
+};

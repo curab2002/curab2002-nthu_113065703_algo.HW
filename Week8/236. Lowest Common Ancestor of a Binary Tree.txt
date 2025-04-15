@@ -1,0 +1,28 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        // base case: 空節點 或 找到 p/q 就回傳
+        if (root == nullptr || root == p || root == q)
+            return root;
+
+        // 遞迴遍歷左、右子樹
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        // 若左右子樹都非空，說明一邊各找到一個節點，該節點即為 LCA
+        if (left != nullptr && right != nullptr)
+            return root;
+
+        // 若只有左/右子樹非空，代表兩節點都在其中，回傳非空的那邊
+        return left != nullptr ? left : right;
+    }
+};

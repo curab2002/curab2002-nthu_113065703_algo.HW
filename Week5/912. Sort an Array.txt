@@ -1,0 +1,47 @@
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        heapSort(nums);
+        return nums;
+    }
+
+private:
+    void heapSort(vector<int>& arr) {
+        int n = arr.size();
+        
+        // 建立Max geap：從最後一個non-leaf node 往前做 siftDown
+        for (int i = (n / 2) - 1; i >= 0; --i) {
+            siftDown(arr, i, n);
+        }
+        
+        // 反覆把root(Max)放到末尾，並縮小heap的有效範圍
+        for (int i = n - 1; i > 0; --i) {
+            // swap root (最大) 與目前最尾的元素
+            std::swap(arr[0], arr[i]);
+            // 調整heap，確保root是下一個最大值
+            siftDown(arr, 0, i);
+        }
+    }
+    
+    // 在範圍 [0, heapSize) 內，對index i 進行 siftDown
+    void siftDown(vector<int>& arr, int i, int heapSize) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        
+        // 如果左子節點存在，而且比 parent 大，largest = left
+        if (left < heapSize && arr[left] > arr[largest]) {
+            largest = left;
+        }
+        // 如果右子節點存在，而且比目前 largest 大，largest = right
+        if (right < heapSize && arr[right] > arr[largest]) {
+            largest = right;
+        }
+        
+        // 若 largest != i，表示子節點比 parent 大，要交換並繼續往下 siftDown
+        if (largest != i) {
+            std::swap(arr[i], arr[largest]);
+            siftDown(arr, largest, heapSize);
+        }
+    }
+};
