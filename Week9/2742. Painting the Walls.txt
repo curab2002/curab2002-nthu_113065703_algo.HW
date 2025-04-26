@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int paintWalls(vector<int>& cost, vector<int>& time) {
+        const int n = cost.size();
+        const long long INF = 4e18;          // 夠大的初值
+        vector<long long> dp(n + 1, INF);    // dp[j] = 覆蓋 j 面牆所需最小花費
+        dp[0] = 0;
+
+        for (int i = 0; i < n; ++i) {
+            int cap = time[i] + 1;           // 付費刷自己 + 免費刷 time[i] 面
+            long long c = cost[i];
+            // 逆序掃描，避免單一牆被重複選
+            for (int j = n; j >= 0; --j) {
+                if (dp[j] == INF) continue;
+                int nxt = min(n, j + cap);   // 最多覆蓋到 n
+                dp[nxt] = min(dp[nxt], dp[j] + c);
+            }
+        }
+        return dp[n];                        // 至少覆蓋 n 面牆的最小成本
+    }
+};
