@@ -1,0 +1,45 @@
+class Solution {
+public:
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<int> parent(n + 1, 0);
+        vector<int> cand1, cand2;
+
+        // Step 1: check if there is a node with two parents
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1];
+            if (parent[v] == 0) {
+                parent[v] = u;
+            } else {
+                // Already has a parent -> two parents case
+                cand1 = {parent[v], v}; // previous edge
+                cand2 = {u, v};         // current edge
+                edge[1] = 0; // Temporarily invalidate cand2
+            }
+        }
+
+        // Step 2: Union-Find to detect cycle
+        vector<int> uf(n + 1);
+        for (int i = 1; i <= n; ++i) uf[i] = i;
+
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1];
+            if (v == 0) continue; // skip the invalidated cand2
+            int pu = find(uf, u);
+            if (pu == v) {
+                // Cycle detected
+                if (!cand1.empty()) return cand1;
+                return edge;
+            }
+            uf[v] = pu;
+        }
+
+        // No cycle, return the later edge that caused double parent
+        return cand2;
+    }
+
+    int find(vector<int>& uf, int x) {
+        if (uf[x] != x) uf[x] = find(uf, uf[x]);
+        return uf[x];
+    }
+};

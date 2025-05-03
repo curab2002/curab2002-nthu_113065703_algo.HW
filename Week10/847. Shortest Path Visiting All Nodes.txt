@@ -1,0 +1,39 @@
+class Solution {
+public:
+    int shortestPathLength(vector<vector<int>>& graph) {
+        int n = graph.size();
+        if (n == 1) return 0;  // 只有一個節點，直接返回
+
+        // visited[node][mask] 表示是否走過 node 且 visited mask 狀態
+        vector<vector<bool>> visited(n, vector<bool>(1 << n, false));
+        queue<tuple<int, int, int>> q;  // (node, visited_mask, steps)
+
+        // 初始狀態：每個節點都可以當起點
+        for (int i = 0; i < n; ++i) {
+            int mask = 1 << i;
+            q.emplace(i, mask, 0);
+            visited[i][mask] = true;
+        }
+
+        while (!q.empty()) {
+            auto [node, mask, steps] = q.front();
+            q.pop();
+
+            // 如果已經拜訪所有節點，回傳當前length
+            if (mask == (1 << n) - 1) {
+                return steps;
+            }
+
+            // 嘗試從 node 移動到所有相鄰節點
+            for (int neighbor : graph[node]) {
+                int nextMask = mask | (1 << neighbor);
+                if (!visited[neighbor][nextMask]) {
+                    visited[neighbor][nextMask] = true;
+                    q.emplace(neighbor, nextMask, steps + 1);
+                }
+            }
+        }
+
+        return -1; 
+    }
+};
