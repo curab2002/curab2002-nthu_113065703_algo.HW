@@ -1,0 +1,36 @@
+class ExamRoom {
+    int N;
+    set<int> occ;
+public:
+    
+    ExamRoom(int n):N(n) {}
+    
+    int seat() {
+        if (occ.empty()) {
+            occ.insert(0);
+            return 0;
+        }
+        int best = 0, dist = *occ.begin();          // 左邊空隙
+        int prev = *occ.begin();
+        // 中間空隙：目前位置和前一 occupied 之間取中點
+        for (auto it = next(occ.begin()); it != occ.end(); ++it) {
+            int cur = *it;
+            int d = (cur - prev) / 2;
+            if (d > dist) {
+                dist = d;
+                best = prev + d;
+            }
+            prev = cur;
+        }
+        // 右邊空隙
+        if (N - 1 - *occ.rbegin() > dist) {
+            best = N - 1;
+        }
+        occ.insert(best);
+        return best;
+    }
+    
+    void leave(int p) {
+        occ.erase(p);
+    }
+};
