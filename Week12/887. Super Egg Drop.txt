@@ -1,0 +1,16 @@
+class Solution {
+public:
+    int superEggDrop(int k, int n) {
+        // dp[j] = 在 m 步內 j 個蛋，最多能測試幾層
+        vector<long long> dp(k + 1, 0);
+        int m = 0;
+        while (dp[k] < n) {
+            m++;
+            // 更新：從後往前，保證用到的是「上一步」的狀態
+            for (int j = k; j >= 1; --j) {
+                dp[j] = dp[j] + dp[j - 1] + 1;
+            }
+        }
+        return m;
+    }
+};

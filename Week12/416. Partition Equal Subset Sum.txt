@@ -1,0 +1,21 @@
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int total = accumulate(nums.begin(), nums.end(), 0);
+        // 若總和為奇數，無法平分
+        if (total % 2) return false;
+        int target = total / 2;
+
+        // dp[j] = 是否能從某些元素湊出和 j
+        vector<bool> dp(target + 1, false);
+        dp[0] = true;
+
+        for (int num : nums) {
+            // 逆序更新，避免重複使用同一個 num
+            for (int j = target; j >= num; --j) {
+                dp[j] = dp[j] || dp[j - num];
+            }
+        }
+        return dp[target];
+    }
+};
