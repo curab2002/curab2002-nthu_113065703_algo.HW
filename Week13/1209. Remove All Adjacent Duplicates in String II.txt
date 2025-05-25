@@ -1,0 +1,29 @@
+class Solution {
+public:
+    string removeDuplicates(string s, int k) {
+        // 使用 vector 當作 stack，存放 pair<字符, 連續出現次數>
+        vector<pair<char,int>> stk;
+        for (char c : s) {
+            // 若 stack 不為空且與前一個字符相同
+            if (!stk.empty() && stk.back().first == c) {
+                // 將 count 加 1
+                stk.back().second++;
+                // 若 count 達到 k，就 pop 掉該組元素 (做一次 k-duplicate removal)
+                if (stk.back().second == k) {
+                    stk.pop_back();
+                }
+            } else {
+                // 新字符或不同字符，push 新的 pair
+                stk.emplace_back(c, 1);
+            }
+        }
+        // 最後從 stack 重組結果字串
+        string ans;
+        ans.reserve(s.size());
+        for (auto &p : stk) {
+            // append p.second 個 p.first
+            ans.append(p.second, p.first);
+        }
+        return ans;
+    }
+};

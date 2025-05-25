@@ -1,0 +1,34 @@
+class Solution {
+public:
+    string removeDuplicateLetters(string s) {
+        int n = s.size();
+        // 記錄每個字母最後一次出現的位置
+        vector<int> last(26, 0);
+        for (int i = 0; i < n; ++i) {
+            last[s[i] - 'a'] = i;
+        }
+
+        vector<bool> inStack(26, false);  // 標記字母是否已在 stack 中
+        vector<char> stk;                 // 用 vector 當作 stack
+
+        for (int i = 0; i < n; ++i) {
+            char c = s[i];
+            int idx = c - 'a';
+            // 如果已經在 stack 中，就跳過
+            if (inStack[idx]) continue;
+
+            // 嘗試將當前字符放入前，調整 stack 使之維持 lexicographical order
+            while (!stk.empty() && stk.back() > c && last[stk.back() - 'a'] > i) {
+                // 若 stack 頂端字符在之後還會出現（可安全移除）
+                inStack[stk.back() - 'a'] = false;  // 標記為不在 stack
+                stk.pop_back();                      // pop 掉頂端
+            }
+            // push 當前字符
+            stk.push_back(c);
+            inStack[idx] = true;
+        }
+
+        // 將 stack 內容組回字串並回傳
+        return string(stk.begin(), stk.end());
+    }
+};
