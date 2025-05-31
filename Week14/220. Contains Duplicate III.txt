@@ -1,0 +1,34 @@
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int indexDiff, int valueDiff) {
+        // 使用 multiset 來維護當前滑動視窗中的數值
+        multiset<long long> window;
+        int n = nums.size();
+
+        for (int i = 0; i < n; ++i) {
+            // 在插入 nums[i] 之前，先檢查 window 裡是否有和 nums[i] 差值 <= valueDiff 的數
+            long long x = nums[i];
+            // 要找的範圍是 [x - valueDiff, x + valueDiff]
+            long long lo = x - valueDiff;
+            auto it = window.lower_bound(lo);
+            // 如果 it 沒到末端，且 *it <= x + valueDiff，就代表找到一個符合條件的數
+            if (it != window.end() && *it <= x + valueDiff) {
+                return true;
+            }
+
+            // 將 nums[i] 加到 multiset
+            window.insert(x);
+
+            // 若 window 大小已超過 indexDiff，移除最舊的元素 nums[i - indexDiff]
+            if (i >= indexDiff) {
+                // 必須精確移除一個等於 nums[i-indexDiff] 的元素
+                auto eraseIt = window.find((long long)nums[i - indexDiff]);
+                if (eraseIt != window.end()) {
+                    window.erase(eraseIt);
+                }
+            }
+        }
+
+        return false;
+    }
+};

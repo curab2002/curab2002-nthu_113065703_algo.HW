@@ -1,0 +1,47 @@
+class Solution {
+public:
+    // 核心檢查函式：給定要完成的任務數 k，判斷是否能完成
+    bool canAssign(int k, const vector<int>& tasks, const vector<int>& workers, int pills, int strength) {
+        multiset<int> available(workers.end() - k, workers.end()); // 選出最強的 k 個工人
+        int remaining_pills = pills;
+
+        // 從最難的 task 開始指派（因為 tasks 已排序）
+        for (int i = k - 1; i >= 0; --i) {
+            int task = tasks[i];
+
+            // 嘗試直接用最強工人處理
+            auto it = prev(available.end());
+            if (*it >= task) {
+                available.erase(it);
+            } else {
+                // 嘗試給藥劑（需要找到能+strength後 >= task 的最弱工人）
+                auto it2 = available.lower_bound(task - strength);
+                if (it2 == available.end()) return false;
+                available.erase(it2);
+                if (--remaining_pills < 0) return false;
+            }
+        }
+
+        return true;
+    }
+
+    int maxTaskAssign(vector<int>& tasks, vector<int>& workers, int pills, int strength) {
+        sort(tasks.begin(), tasks.end());
+        sort(workers.begin(), workers.end());
+
+        int left = 0, right = min((int)tasks.size(), (int)workers.size());
+        int answer = 0;
+
+        // 二分搜尋找最大可完成任務數
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (canAssign(mid, tasks, workers, pills, strength)) {
+                answer = mid;
+                left = mid + 1; // 嘗試更多任務
+            } else {
+                right = mid - 1;
+            }
+        }
+        return answer;
+    }
+};
